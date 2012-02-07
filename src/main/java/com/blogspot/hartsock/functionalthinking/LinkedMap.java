@@ -96,8 +96,10 @@ public class LinkedMap implements ObjectMap {
         filter(key, new Actor() {
             public Link act(Object key, Link link) {
                 if (link.next.match(key)) {
-                    link.next = link.next.next;
-                    return link.next;
+                    Link deleted = link.next;
+                	link.next = deleted.next;
+                	deleted.next = null;
+                    return deleted;
                 }
                 return null;
             }
@@ -111,11 +113,8 @@ public class LinkedMap implements ObjectMap {
     Link filter(final Object key, final Actor actor) {
         Link result = null;
     	Link it = head;
-        while(it.hasNext()) {
+        while(it != null && it.hasNext()) {
         	result = actor.act(key,it);
-            if(result == null) {
-                break;
-            }
             it = it.next;
         }
         return result;
@@ -127,11 +126,10 @@ public class LinkedMap implements ObjectMap {
      */
     Link find(final Object key) {
         final Actor finder = new Actor() {
-            Link found = null;
+            Link found;
             public Link act(final Object key, final Link link) {
-                if(link.next.match(key)) {
+                if(found == null && link.next.match(key)) {
                     found = link.next;
-                    return found;
                 }
                 return found;
             }
