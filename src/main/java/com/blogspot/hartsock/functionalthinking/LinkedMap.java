@@ -80,15 +80,8 @@ public class LinkedMap implements ObjectMap {
     /**
      * Interface for hanging anonymous inner class on like a lambda.
      */
-    private interface KeyLinkActor {
-        boolean act(Object key, Link link);
-    }
-
-    /**
-     * Okay, so I needed two kinds of lambdas after all.
-     */
-    private interface Finder extends KeyLinkActor {
-        Link getFound();
+    private interface Actor {
+        Link act(Object key, Link link);
     }
 
     void add(final Object key, final Object value) {
@@ -100,13 +93,13 @@ public class LinkedMap implements ObjectMap {
     }
 
     void delete(Object key) {
-        filter(key, new KeyLinkActor() {
-            public boolean act(Object key, Link link) {
+        filter(key, new Actor() {
+            public Link act(Object key, Link link) {
                 if (link.next.match(key)) {
                     link.next = link.next.next;
-                    return true;
+                    return link.next;
                 }
-                return false;
+                return null;
             }
         });
     }
@@ -115,14 +108,17 @@ public class LinkedMap implements ObjectMap {
          entry.value = value;
     }
 
-    void filter(final Object key, final KeyLinkActor actor) {
-        Link it = head;
+    Link filter(final Object key, final Actor actor) {
+        Link result = null;
+    	Link it = head;
         while(it.hasNext()) {
-            if(actor.act(key,it)) {
+        	result = actor.act(key,it);
+            if(result == null) {
                 break;
             }
             it = it.next;
         }
+        return result;
     }
 
 
@@ -130,18 +126,16 @@ public class LinkedMap implements ObjectMap {
      * finds the link you want to work with.
      */
     Link find(final Object key) {
-        final Finder finder = new Finder() {
+        final Actor finder = new Actor() {
             Link found = null;
-            public Link getFound() { return found; }
-            public boolean act(final Object key, final Link link) {
+            public Link act(final Object key, final Link link) {
                 if(link.next.match(key)) {
                     found = link.next;
-                    return true;
+                    return found;
                 }
-                return false;
+                return found;
             }
         };
-        filter(key, finder);
-        return finder.getFound();
+        return filter(key, finder);
     }
 }
