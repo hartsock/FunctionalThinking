@@ -2,11 +2,13 @@ package com.blogspot.hartsock.functionalthinking;
 
 import com.blogspot.hartsock.functionalthinking.functions.BinaryFunction;
 import com.blogspot.hartsock.functionalthinking.functions.Function;
+import com.blogspot.hartsock.functionalthinking.functions.Predicate;
 import com.blogspot.hartsock.functionalthinking.functions.UnaryFunction;
 import org.junit.Assert;
 import org.junit.Test;
-
+import static com.blogspot.hartsock.functionalthinking.Person.*;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Muhammad Ashraf
@@ -69,4 +71,27 @@ public class FPCollectionTest {
         Assert.assertEquals("incorrect result", expected, result);
     }
 
+    @Test
+    public void testSeparateBoysFromMen() throws Exception {
+        FPCollection<Person> collection=new FPCollection<Person>(Boy("John",16),Man("Tim",40),Man("Peyton",37),Boy("Josh",17));
+
+        final Pair<List<Person>, List<Person>> partition = collection.partition(new Predicate<Person>() {
+            public boolean apply(Person person) {
+                return person.getAge() > 18;
+            }
+        });
+
+        final List<Person> men = partition.getLeft();
+        final List<Person> boys = partition.getRight();
+
+        Assert.assertTrue(men.size()==2);
+        Assert.assertTrue(men.contains(Man("Tim",40)));
+        Assert.assertTrue(men.contains(Man("Peyton",37)));
+
+        Assert.assertTrue(boys.size()==2);
+        Assert.assertTrue(boys.contains(Boy("John",16)));
+        Assert.assertTrue(boys.contains(Boy("Josh",17)));
+
+
+    }
 }

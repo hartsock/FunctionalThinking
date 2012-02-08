@@ -2,12 +2,10 @@ package com.blogspot.hartsock.functionalthinking;
 
 import com.blogspot.hartsock.functionalthinking.functions.BinaryFunction;
 import com.blogspot.hartsock.functionalthinking.functions.Function;
+import com.blogspot.hartsock.functionalthinking.functions.Predicate;
 import com.blogspot.hartsock.functionalthinking.functions.UnaryFunction;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * @author mansoor
@@ -24,7 +22,7 @@ public class FPCollection<T> implements Collection<T> {
         this.collection = collection;
     }
 
-    public FPCollection(final T... values ) {
+    public FPCollection(final T... values) {
         this.collection = new ArrayList<T>(Arrays.asList(values));
     }
 
@@ -95,6 +93,7 @@ public class FPCollection<T> implements Collection<T> {
 
     /**
      * Applies the given function to each element in the collection
+     *
      * @param function function that will be applied
      */
     public void forEach(final Function<T> function) {
@@ -106,10 +105,11 @@ public class FPCollection<T> implements Collection<T> {
     }
 
     /**
-     *  Transform this collection to a new collection by applying given
-     *  function to each element of this collection
+     * Transform this collection to a new collection by applying given
+     * function to each element of this collection
+     *
      * @param function function that will be applied
-     * @param <B>    Type of new collection
+     * @param <B>      Type of new collection
      * @return Collection of type B
      */
     public <B> FPCollection<B> map(final UnaryFunction<T, B> function) {
@@ -126,24 +126,40 @@ public class FPCollection<T> implements Collection<T> {
     /**
      * The infamous FoldLeft method, also know as FOLDL in Haskell, FoldLeft in Scala
      * and Inject in Ruby
-     * @param seed initial value
-     * @param function  function that will be applied
-     * @param <B>  type of the result
+     *
+     * @param seed     initial value
+     * @param function function that will be applied
+     * @param <B>      type of the result
      * @return return Object of type B
      */
     public <B> B foldLeft(final B seed, final BinaryFunction<T, B> function) {
         B result = seed;
-         if(function!=null){
-             for (T t : collection) {
-                 result=function.apply(result,t);
-             }
-         }
+        if (function != null) {
+            for (T t : collection) {
+                result = function.apply(result, t);
+            }
+        }
         return result;
+    }
+
+    Pair<List<T>, List<T>> partition(final Predicate<T> function) {
+        Pair<List<T>, List<T>> seed = new Pair<List<T>, List<T>>(new ArrayList<T>(), new ArrayList<T>());
+
+        return foldLeft(seed, new BinaryFunction<T, Pair<List<T>, List<T>>>() {
+            public Pair<List<T>, List<T>> apply(Pair<List<T>, List<T>> seed, T input) {
+                if (function.apply(input)) {
+                    seed.getLeft().add(input);
+                } else {
+                    seed.getRight().add(input);
+                }
+                return seed;
+            }
+        });
     }
 
     @Override
     public String toString() {
-        return foldLeft(new StringBuilder(),new BinaryFunction<T, StringBuilder>() {
+        return foldLeft(new StringBuilder(), new BinaryFunction<T, StringBuilder>() {
             public StringBuilder apply(StringBuilder seed, T input) {
                 seed.append(input).append(" ");
                 return seed;
