@@ -10,3 +10,9 @@
 .settings/org.eclipse.m2e.core.prefs
 
 target
+
+#IntelliJ files
+*.iml
+*.ipr
+*.iws
+.idea/
