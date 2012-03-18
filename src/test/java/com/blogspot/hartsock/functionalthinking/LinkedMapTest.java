@@ -1,6 +1,6 @@
 package com.blogspot.hartsock.functionalthinking;
 
-import org.junit.AfterClass;
+import org.junit.Before;
 /**
  * Shawn Hartsock
  * hartsock@acm.org<p/>
@@ -11,8 +11,8 @@ import org.junit.AfterClass;
 public class LinkedMapTest extends ObjectMapTest {
 
 	@Override
-	@AfterClass
-	public void setUp() {
+	@Before
+	public void allocateMap() {
 		map = new LinkedMap();
 	}
 }

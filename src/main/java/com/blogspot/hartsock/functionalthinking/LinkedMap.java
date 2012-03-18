@@ -7,4 +7,16 @@ package com.blogspot.hartsock.functionalthinking;
  */
 public class LinkedMap implements ObjectMap {
 
+	@Override
+	public void put(Object key, Object value) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Object get(Object key) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
