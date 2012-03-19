@@ -13,36 +13,29 @@ public class LinkedMap implements ObjectMap {
 		Link next;
 	}
 	
-	Link head;
+	Link head = new Link(null,null);
 	
 	@Override
 	public void put(Object key, Object value) {
 		if(key == null) {
 			throw new NullKeyIsIllegal();
 		}
-		if(head == null) {
-			head = new Link(key,value);
+		Link last = null;
+		Link current = head;
+		while (current != null && !current.keyIs(key)) {
+			last = current;
+			current = current.next;
 		}
-		else {
-			Link last = null;
-			Link current = head;
-			while(current != null && !current.keyIs(key)) {
-				last = current;
-				current = current.next;
+		if (current != null) {
+			Link replacement = new Link(current.getKey(), value);
+			replacement.next = current.next;
+			if (last != null) {
+				last.next = replacement;
+			} else {
+				head = replacement;
 			}
-			if(current != null) {
-				Link replacement = new Link(current.getKey(),value);
-				replacement.next = current.next;
-				if(last != null) {
-					last.next = replacement;					
-				}
-				else {
-					head = replacement;
-				}
-			}
-			else {
-				last.next = new Link(key,value);
-			}
+		} else {
+			last.next = new Link(key, value);
 		}
 	}
 
