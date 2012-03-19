@@ -16,41 +16,52 @@ public class LinkedMap implements ObjectMap {
 	Link head = new Link(null,null);
 	
 	@Override
-	public void put(Object key, Object value) {
+	public boolean put(Object key, Object value) {
 		if(key == null) {
 			throw new NullKeyIsIllegal();
 		}
-		Link current = filter(key, new Actor() {
+		Link current = find(key);
+		return (current != null) ?
+			swap(current, value) : append(key, value);
+		
+	}
+
+	private boolean swap(Link current, Object value) {
+		Link replacement = new Link(current.getKey(), value);
+		replacement.next = current.next;
+		Link last = filter(current, new Actor() {
+			public Link action(Object current, Link link) {
+				return link.next == current ? link : null;
+			}
+		});
+		if (last != null) {
+			last.next = replacement;
+		} else {
+			head = replacement;
+		}
+		return true;
+	}
+
+	private boolean append(Object key, Object value) {
+		filter(new Link(key, value) ,new Actor() {
+			public Link action(Object tail, Link current) {
+				if(current.next == null) {
+					current.next = (Link) tail;
+					return (Link) tail;
+				}
+				else 
+					return null;
+			}
+		});
+		return true;
+	}
+
+	private Link find(Object key) {
+		return filter(key, new Actor() {
 			public Link action(Object key, Link link) {
 				return link.keyIs(key) ? link : null;
 			}
 		});
-		if (current != null) {
-			Link replacement = new Link(current.getKey(), value);
-			replacement.next = current.next;
-			Link last = filter(current, new Actor() {
-				public Link action(Object current, Link link) {
-					return link.next == current ? link : null;
-				}
-			});
-			if (last != null) {
-				last.next = replacement;
-			} else {
-				head = replacement;
-			}
-		} else {
-			Link tail = new Link(key, value);
-			filter(tail,new Actor() {
-				public Link action(Object tail, Link current) {
-					if(current.next == null) {
-						current.next = (Link) tail;
-						return (Link) tail;
-					}
-					else 
-						return null;
-				}
-			});
-		}
 	}
 
 	interface Actor {
@@ -73,12 +84,7 @@ public class LinkedMap implements ObjectMap {
 	
 	@Override
 	public Object get(Object key) {
-		Link current = filter(key, new Actor() {
-			public Link action(Object key, Link link) {
-				return link.keyIs(key) ? link : null;
-			}
-		});
-		
+		Link current = find(key);
 		return (current != null) ? current.getValue() : null;
 	}
 

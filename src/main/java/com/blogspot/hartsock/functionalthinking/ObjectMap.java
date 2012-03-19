@@ -16,8 +16,9 @@ public interface ObjectMap {
 	 * </ol>
 	 * @param key
 	 * @param value
+	 * @return 
 	 */
-    void put(Object key, Object value);
+    boolean put(Object key, Object value);
     /**
      * returns the last value put for a given key
      * @param key
